@@ -19,7 +19,7 @@ from django.urls import path, include
 
 urlpatterns = [
     # TO-DO: CBV로 수정하기
-    path('/', include('account.urls')),
+    path('/', include('accounts.urls')),
     path('admin/', admin.site.urls),
-    path('board/', include('board.urls')),
+    path('boards/', include('boards.urls')),
 ]

@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.db import models
 
-from account.models import Users
+from accounts.models import Users
 
 
 class Category(models.Model):

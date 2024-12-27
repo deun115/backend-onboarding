@@ -43,7 +43,7 @@ SIMPLE_JWT = {
     "TOKEN_OBTAIN_SERIALIZER": "backend-onboarding.serializers.MyTokenObtainPairSerializer",
     "USER_ID_FIELD": "uuid",  # 기본 키를 uuid로 변경
     "USER_ID_CLAIM": "user_id",  # JWT에서 기본 사용자 식별 클레임 이름 설정
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),  # 토큰 만료 시간 (선택 사항)
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),  # 토큰 만료 시간 (선택 사항)
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),    # 리프레시 토큰 만료 시간 (선택 사항)
 }
 

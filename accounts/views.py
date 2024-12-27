@@ -2,8 +2,12 @@ import uuid
 
 from django.contrib.auth.hashers import check_password, make_password
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+from rest_framework_simplejwt.views import TokenBlacklistView
 
 from accounts.models import Users
 from accounts.serializers import UserSerializer, MyTokenObtainPairSerializer
@@ -104,3 +108,36 @@ class RegisterAPIView(APIView):
             return res
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserLogoutAPIView(TokenBlacklistView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request, *args, **kwargs):
+        # Refresh 토큰 가져오기
+        refresh_token = request.COOKIES.get("refresh")
+        if not refresh_token:
+            return Response(
+                {"detail": "토큰이 존재하지 않습니다."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # 토큰 블랙리스트 처리
+        data = {"refresh": str(refresh_token)}
+        serializer = self.get_serializer(data=data)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except TokenError as e:
+            raise InvalidToken(e.args[0])
+
+        # 응답 설정
+        response = Response(
+            {"detail": "로그아웃 성공"},
+            status=status.HTTP_200_OK,
+        )
+        response.delete_cookie("refresh")
+        response.delete_cookie("access")
+
+        return response

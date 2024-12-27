@@ -15,6 +15,9 @@ class Category(models.Model):
     def __str__(self):
         return self.id
 
+    class Meta:
+        db_table = "category"
+
 
 class Board(models.Model):
     uuid = models.UUIDField(primary_key=True)
@@ -30,6 +33,9 @@ class Board(models.Model):
     def __str__(self):
         return self.uuid
 
+    class Meta:
+        db_table = "board"
+
 
 class Comment(models.Model):
     uuid = models.UUIDField(primary_key=True)
@@ -42,3 +48,6 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.uuid
+
+    class Meta:
+        db_table = "comment"

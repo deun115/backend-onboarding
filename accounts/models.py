@@ -28,7 +28,7 @@ class UserManager(BaseUserManager):
 
 class Users(AbstractBaseUser):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    password = models.CharField(null=False, max_length=50)
+    password = models.CharField(null=False, max_length=128)
     nickname = models.CharField(null=False, max_length=50, unique=True)
 
     is_active = models.BooleanField(default=True)

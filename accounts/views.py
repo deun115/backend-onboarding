@@ -1,6 +1,6 @@
 import uuid
 
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import check_password, make_password
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,8 +12,8 @@ from accounts.serializers import UserSerializer, MyTokenObtainPairSerializer
 # 로그인 뷰
 class UserLoginAPIView(APIView):
     def post(self, request):
-        nickname = request.data['username']
-        password = request.data['password']
+        nickname = request.data.get('nickname')
+        password = request.data.get('password')
 
         user = Users.objects.filter(nickname=nickname).first()
 
@@ -34,7 +34,7 @@ class UserLoginAPIView(APIView):
             response = Response(
                 {
                     "user": UserSerializer(user).data,
-                    "message": "login success",
+                    "message": "로그인 성공",
                     "jwt_token": {
                         "access_token": access_token,
                         "refresh_token": refresh_token
@@ -48,7 +48,8 @@ class UserLoginAPIView(APIView):
             return response
         else:
             return Response(
-                {"message": "로그인에 실패하였습니다."}, status=status.HTTP_400_BAD_REQUEST
+                {"message": "로그인에 실패하였습니다."},
+                status=status.HTTP_400_BAD_REQUEST
             )
 
 
@@ -57,23 +58,30 @@ class RegisterAPIView(APIView):
     def post(self, request):
         nickname = request.data.get('nickname')
 
+        # 닉네임 중복 확인
         if Users.objects.filter(nickname=nickname).exists():
             return Response(
                 {"message": "이미 존재하는 닉네임입니다."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        # 비밀번호 해싱
+        raw_password = request.data.get('password')
+        hashed_password = make_password(raw_password)
+
+        # 사용자 데이터 생성
         user_uuid = uuid.uuid4()
         user_data = {
             "uuid": user_uuid,
-            "nickname": request.data.get('nickname'),
-            "password": request.data.get('password'),
+            "nickname": nickname,
+            "password": hashed_password,  # 해싱된 비밀번호 저장
         }
         serializer = UserSerializer(data=user_data)
 
         if serializer.is_valid():
             user = serializer.save()
 
+            # JWT 토큰 생성
             token = MyTokenObtainPairSerializer.get_token(user)
             refresh_token = str(token)
             access_token = str(token.access_token)
@@ -82,7 +90,6 @@ class RegisterAPIView(APIView):
                     "user": {
                         "uuid": user.uuid,
                         "nickname": user.nickname,
-                        "password": user.password,
                     },
                     "message": "회원가입 성공",
                     "token": {
@@ -90,9 +97,10 @@ class RegisterAPIView(APIView):
                         "refresh": refresh_token,
                     },
                 },
-                status=status.HTTP_200_OK
+                status=status.HTTP_201_CREATED
             )
             res.set_cookie("access", access_token, httponly=True)
             res.set_cookie("refresh", refresh_token, httponly=True)
             return res
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

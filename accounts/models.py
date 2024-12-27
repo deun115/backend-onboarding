@@ -38,7 +38,7 @@ class Users(AbstractBaseUser):
     objects = UserManager()
 
     def __str__(self):
-        return self.uuid
+        return str(self.uuid)
 
     class Meta:
         db_table = "users"

@@ -1,8 +1,10 @@
 import uuid
 
 from django.contrib.auth.hashers import check_password, make_password
+from django.shortcuts import redirect
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -15,6 +17,13 @@ from accounts.serializers import UserSerializer, MyTokenObtainPairSerializer
 
 # 로그인 뷰
 class UserLoginAPIView(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'account_login.html'
+
+    def get(self, request):
+        # 로그인 페이지 렌더링
+        return Response(template_name=self.template_name)
+
     def post(self, request):
         nickname = request.data.get('nickname')
         password = request.data.get('password')
@@ -37,18 +46,18 @@ class UserLoginAPIView(APIView):
             access_token = str(token.access_token)  # access 토큰 문자열화
             response = Response(
                 {
-                    "user": UserSerializer(user).data,
                     "message": "로그인 성공",
-                    "jwt_token": {
-                        "access_token": access_token,
-                        "refresh_token": refresh_token
-                    },
+                    "user": UserSerializer(user).data
                 },
+                template_name="category_list.html",  # 템플릿 렌더링
                 status=status.HTTP_200_OK
             )
 
             response.set_cookie("access_token", access_token, httponly=True)
             response.set_cookie("refresh_token", refresh_token, httponly=True)
+            response.headers['Authorization'] = f"Bearer {access_token}"
+            response.headers['Refresh-Token'] = refresh_token
+
             return response
         else:
             return Response(
@@ -59,6 +68,7 @@ class UserLoginAPIView(APIView):
 
 # 회원가입 뷰
 class RegisterAPIView(APIView):
+
     def post(self, request):
         nickname = request.data.get('nickname')
 
@@ -119,7 +129,7 @@ class UserLogoutAPIView(TokenBlacklistView):
         refresh_token = request.COOKIES.get("refresh")
         if not refresh_token:
             return Response(
-                {"detail": "토큰이 존재하지 않습니다."},
+                {"message": "토큰이 존재하지 않습니다."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -134,7 +144,7 @@ class UserLogoutAPIView(TokenBlacklistView):
 
         # 응답 설정
         response = Response(
-            {"detail": "로그아웃 성공"},
+            {"message": "로그아웃 성공"},
             status=status.HTTP_200_OK,
         )
         response.delete_cookie("refresh")

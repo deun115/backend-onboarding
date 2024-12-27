@@ -7,6 +7,7 @@ from accounts.models import Users
 
 class Category(models.Model):
     id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
     is_opened = models.BooleanField(default=False)
     depth1 = models.CharField(max_length=20, null=False)
     depth2 = models.CharField(max_length=20, null=True)
@@ -31,7 +32,7 @@ class Board(models.Model):
     deleted_at = models.DateTimeField(null=True)
 
     def __str__(self):
-        return self.uuid
+        return str(self.uuid)
 
     class Meta:
         db_table = "board"
@@ -41,13 +42,14 @@ class Comment(models.Model):
     uuid = models.UUIDField(primary_key=True)
     user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
     board_id = models.ForeignKey(Board, on_delete=models.CASCADE)
+    content = models.CharField(max_length=200, null=False)
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=datetime.now, null=False)
     updated_at = models.DateTimeField(null=True)
     deleted_at = models.DateTimeField(null=True)
 
     def __str__(self):
-        return self.uuid
+        return str(self.uuid)
 
     class Meta:
         db_table = "comment"

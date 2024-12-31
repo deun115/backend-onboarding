@@ -1,7 +1,4 @@
-import uuid
-
 from django.contrib.auth.hashers import check_password, make_password
-from django.shortcuts import redirect
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import TemplateHTMLRenderer
@@ -82,9 +79,7 @@ class RegisterAPIView(APIView):
         hashed_password = make_password(raw_password)
 
         # 사용자 데이터 생성
-        user_uuid = uuid.uuid4()
         user_data = {
-            "uuid": user_uuid,
             "nickname": nickname,
             "password": hashed_password,  # 해싱된 비밀번호 저장
         }
@@ -100,7 +95,7 @@ class RegisterAPIView(APIView):
             res = Response(
                 {
                     "user": {
-                        "uuid": user.uuid,
+                        "id": user.id,
                         "nickname": user.nickname,
                     },
                     "message": "회원가입 성공",

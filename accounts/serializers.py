@@ -1,5 +1,3 @@
-import uuid
-
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -12,14 +10,14 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token = super().get_token(user)
 
         # Add custom claims
-        token['uuid'] = str(user.uuid)
+        token['id'] = user.id
         token['nickname'] = user.nickname
 
         return token
 
 
 class UserSerializer(serializers.ModelSerializer):
-    uuid = serializers.UUIDField()
+    id = serializers.IntegerField()
     nickname = serializers.JSONField()
     password = serializers.JSONField()
 
@@ -31,7 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
         return Users.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        instance.uuid = validated_data.get('uuid', instance.uuid)
+        instance.id = validated_data.get('id', instance.uuid)
         instance.password = validated_data.get('password', instance.password)
         instance.nickname = validated_data.get('nickname', instance.nickname)
         instance.save()

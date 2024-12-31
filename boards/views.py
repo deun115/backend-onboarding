@@ -1,12 +1,9 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.tokens import AccessToken
 
 from boards.models import Category, Board, Comment
 from boards.permissions import IsOwnerOrReadOnly
@@ -18,8 +15,7 @@ def get_user_instance(request):
     try:
         access_token = request.headers['Authorization']
         decoded = access_token.split(' ')[1]
-        print(decoded)
-        user_id = decoded['uuid']
+        user_id = decoded['id']
         user_nickname = decoded['nickname']
 
         if not access_token:

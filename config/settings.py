@@ -34,6 +34,9 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '*']
 
 
 REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
@@ -41,10 +44,13 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     "TOKEN_OBTAIN_SERIALIZER": "backend-onboarding.serializers.MyTokenObtainPairSerializer",
-    "USER_ID_FIELD": "uuid",  # 기본 키를 uuid로 변경
-    "USER_ID_CLAIM": "user_id",  # JWT에서 기본 사용자 식별 클레임 이름 설정
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),  # 토큰 만료 시간 (선택 사항)
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),    # 리프레시 토큰 만료 시간 (선택 사항)
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=50),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+
+    "AUTH_HEADER_TYPES": ("Bearer", "JWT"),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION"
 }
 
 
@@ -64,6 +70,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'boards.middleware.JWTAuthenticationMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

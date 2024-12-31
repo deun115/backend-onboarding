@@ -1,5 +1,3 @@
-import uuid
-
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.db import models
 
@@ -27,7 +25,7 @@ class UserManager(BaseUserManager):
 
 
 class Users(AbstractBaseUser):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.AutoField(primary_key=True)
     password = models.CharField(null=False, max_length=128)
     nickname = models.CharField(null=False, max_length=50, unique=True)
 
@@ -38,7 +36,7 @@ class Users(AbstractBaseUser):
     objects = UserManager()
 
     def __str__(self):
-        return self.uuid
+        return str(self.id)
 
     class Meta:
         db_table = "users"

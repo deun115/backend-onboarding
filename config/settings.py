@@ -43,9 +43,9 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     "TOKEN_OBTAIN_SERIALIZER": "backend-onboarding.serializers.MyTokenObtainPairSerializer",
-    "USER_ID_FIELD": "uuid",
+    "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=50),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 
     "AUTH_HEADER_TYPES": ("Bearer", "JWT"),
@@ -69,6 +69,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'boards.middleware.JWTAuthenticationMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

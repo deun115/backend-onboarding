@@ -1,20 +1,26 @@
 from django.urls import path
-from boards.views import CategoryAPIView, CommentAPIView, BoardAPIView
+from boards.views import CategoryAPIView, CommentAPIView, BoardAPIView, BoardSearchViewSet
 
-board_api = BoardAPIView.as_view(
+board_list_api = BoardAPIView.as_view(
     {
         "get": "list",
         "post": "create",
-        "delete": "destroy",
-        "put": "update",
     }
 )
 
-# board_search_api = BoardAPIView.as_view(
-#     {
-#         "get": "retrieve"
-#     }
-# )
+board_detail_api = BoardAPIView.as_view(
+    {
+        "get": "retrieve",
+        "put": "update",
+        "delete": "destroy",
+    }
+)
+
+board_search_api = BoardSearchViewSet.as_view(
+    {
+        "get": "list"
+    }
+)
 
 category_list_api = CategoryAPIView.as_view(
     {
@@ -33,8 +39,9 @@ comment_api = CommentAPIView.as_view(
 )
 
 urlpatterns = [
-    path('', board_api),
-    # path('search/<>', board_search_api),
+    path('', board_list_api, name='board_list_api'),
+    path('<int:pk>/', board_detail_api),
+    path('search/', board_search_api),
     path('category/', category_list_api),
     path('comment/', comment_api),
 ]

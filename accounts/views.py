@@ -1,4 +1,6 @@
 from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth.models import update_last_login
+from django.shortcuts import redirect
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import TemplateHTMLRenderer
@@ -41,17 +43,15 @@ class UserLoginAPIView(APIView):
             token = MyTokenObtainPairSerializer.get_token(user)  # refresh 토큰 생성
             refresh_token = str(token)  # refresh 토큰 문자열화
             access_token = str(token.access_token)  # access 토큰 문자열화
-            response = Response(
-                {
-                    "message": "로그인 성공",
-                    "user": UserSerializer(user).data
-                },
-                template_name="category_list.html",  # 템플릿 렌더링
-                status=status.HTTP_200_OK
-            )
 
+            response = redirect('board_list_api')
             response.headers['Authorization'] = f"Bearer {access_token}"
             response.headers['Refresh-Token'] = refresh_token
+
+            response.set_cookie("access_token", access_token, httponly=True)
+            response.set_cookie("refresh_token", refresh_token, httponly=True)
+
+            update_last_login(None, user)
 
             return response
         else:
@@ -95,7 +95,6 @@ class RegisterAPIView(APIView):
             res = Response(
                 {
                     "user": {
-                        "id": user.id,
                         "nickname": user.nickname,
                     },
                     "message": "회원가입 성공",

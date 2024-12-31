@@ -53,8 +53,6 @@ class UserLoginAPIView(APIView):
                 status=status.HTTP_200_OK
             )
 
-            response.set_cookie("access_token", access_token, httponly=True)
-            response.set_cookie("refresh_token", refresh_token, httponly=True)
             response.headers['Authorization'] = f"Bearer {access_token}"
             response.headers['Refresh-Token'] = refresh_token
 
@@ -113,8 +111,8 @@ class RegisterAPIView(APIView):
                 },
                 status=status.HTTP_201_CREATED
             )
-            res.set_cookie("access", access_token, httponly=True)
-            res.set_cookie("refresh", refresh_token, httponly=True)
+            res.headers['Authorization'] = f"Bearer {access_token}"
+            res.headers['Refresh-Token'] = refresh_token
             return res
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

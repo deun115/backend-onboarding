@@ -9,7 +9,7 @@ class Category(models.Model):
     id = models.AutoField(primary_key=True)
     user_id = models.ForeignKey(Users, on_delete=models.CASCADE)
     is_opened = models.BooleanField(default=False)
-    depth1 = models.CharField(max_length=20, null=False)
+    depth1 = models.CharField(max_length=20, null=False, unique=True)
     depth2 = models.CharField(max_length=20, null=True)
     depth3 = models.CharField(max_length=20, null=True)
 
